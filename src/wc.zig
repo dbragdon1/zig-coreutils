@@ -35,10 +35,6 @@ pub fn main() !void {
 
     var reader = buffered.reader();
 
-    var arr = std.ArrayList(u8).init(allocator);
-
-    defer arr.deinit();
-
     var wc: usize = 0; // word count
     var lc: usize = 0; // line count
     var bc: usize = 0; // byte count
