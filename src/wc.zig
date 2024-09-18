@@ -31,28 +31,31 @@ pub fn main() !void {
 
     defer file.close();
 
-    var buffered = std.io.bufferedReader(file.reader());
+    var buffer: [4096]u8 = undefined;
 
-    var reader = buffered.reader();
+    var reader = file.reader();
 
     var wc: usize = 0; // word count
     var lc: usize = 0; // line count
     var bc: usize = 0; // byte count
 
     while (true) {
-        const byte = reader.readByte() catch |err| switch (err) {
-            error.EndOfStream => break,
-            else => return err,
-        };
+        const bytesRead = try reader.read(&buffer);
 
-        if (byte == '\n') {
-            wc += 1;
-            lc += 1;
-        } else if (byte == ' ') {
-            wc += 1;
+        bc += bytesRead;
+
+        if (bytesRead == 0) {
+            break;
         }
 
-        bc += 1;
+        for (buffer) |byte| {
+            if (byte == '\n') {
+                wc += 1;
+                lc += 1;
+            } else if (byte == ' ') {
+                wc += 1;
+            }
+        }
     }
 
     std.debug.print(" {d} {d} {d} {s}\n", .{ lc, wc, bc, filename });
