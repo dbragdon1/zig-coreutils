@@ -22,18 +22,18 @@ pub fn main() !void {
         break;
     }
 
+    var reader: std.fs.File.Reader = undefined;
+
     if (arg_count == 0) {
-        std.debug.print("usage: wc <filename>\n", .{});
-        return;
+        const stdin = std.io.getStdIn();
+        reader = stdin.reader();
+    } else {
+        var file = try std.fs.cwd().openFile(filename, .{});
+        //defer file.close();
+        reader = file.reader();
     }
 
-    var file = try std.fs.cwd().openFile(filename, .{});
-
-    defer file.close();
-
     var buffer: [4096]u8 = undefined;
-
-    var reader = file.reader();
 
     var wc: usize = 0; // word count
     var lc: usize = 0; // line count
