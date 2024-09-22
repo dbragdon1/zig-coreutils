@@ -43,7 +43,7 @@ pub fn main() !void {
     _ = args.skip(); // skip the program name
 
     var arg_count: usize = 0;
-    var filename: []const u8 = "";
+    var filename: []const u8 = "-";
 
     while (args.next()) |arg| {
         filename = arg;
@@ -56,9 +56,23 @@ pub fn main() !void {
     if (arg_count == 0) {
         const stdin = std.io.getStdIn();
         reader = stdin.reader();
-        try count(reader, "-");
+        try count(reader, filename);
     } else {
-        var file = try std.fs.cwd().openFile(filename, .{});
+        var file = std.fs.cwd().openFile(filename, .{}) catch |err| switch (err) {
+            std.posix.OpenError.AccessDenied => {
+                std.debug.print("wc: {s}: Access denied\n", .{filename});
+                return;
+            },
+            std.posix.OpenError.FileNotFound => {
+                std.debug.print("wc: {s}: No such file or directory\n", .{filename});
+                return;
+            },
+            else => {
+                std.debug.print("wc: {s}: Unexpected Error\n", .{filename});
+                return;
+            },
+        };
+
         defer file.close();
         reader = file.reader();
         try count(reader, filename);
