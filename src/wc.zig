@@ -3,13 +3,13 @@ const std = @import("std");
 test "count lines" {}
 
 pub fn count(reader: std.fs.File.Reader, filename: []const u8) !void {
-    var buffer: [4096]u8 = undefined;
-
     var wc: usize = 0; // word count
     var lc: usize = 0; // line count
     var bc: usize = 0; // byte count
 
     while (true) {
+        var buffer: [4096]u8 = undefined;
+
         const bytesRead = try reader.read(&buffer);
 
         bc += bytesRead;
