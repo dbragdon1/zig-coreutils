@@ -3,6 +3,7 @@ const std = @import("std");
 test "count lines" {}
 
 pub fn count(reader: std.fs.File.Reader, filename: []const u8) !void {
+    var in_word: bool = false;
     var wc: usize = 0; // word count
     var lc: usize = 0; // line count
     var bc: usize = 0; // byte count
@@ -20,11 +21,23 @@ pub fn count(reader: std.fs.File.Reader, filename: []const u8) !void {
 
         for (buffer) |byte| {
             if (byte == '\n') {
-                wc += 1;
+                if (in_word == true) {
+                    in_word = false;
+                    wc += 1;
+                }
                 lc += 1;
             } else if (byte == ' ') {
-                wc += 1;
+                if (in_word == true) {
+                    in_word = false;
+                    wc += 1;
+                }
+            } else {
+                if (in_word == false) {
+                    in_word = true;
+                }
             }
+
+            //std.debug.print("{b}", .{byte});
         }
     }
 
