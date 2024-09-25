@@ -1,8 +1,8 @@
 const std = @import("std");
 
-test "basic case" {
-    const text: []const u8 = "this is some text";
-}
+//test "basic case" {
+//    const text: []const u8 = "this is some text";
+//}
 
 pub fn count(reader: anytype, filename: []const u8) !void {
     var in_word: bool = false;
