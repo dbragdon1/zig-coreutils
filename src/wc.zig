@@ -1,8 +1,10 @@
 const std = @import("std");
 
-test "count lines" {}
+test "basic case" {
+    const text: []const u8 = "this is some text";
+}
 
-pub fn count(reader: std.fs.File.Reader, filename: []const u8) !void {
+pub fn count(reader: anytype, filename: []const u8) !void {
     var in_word: bool = false;
     var wc: usize = 0; // word count
     var lc: usize = 0; // line count
@@ -36,8 +38,6 @@ pub fn count(reader: std.fs.File.Reader, filename: []const u8) !void {
                     in_word = true;
                 }
             }
-
-            //std.debug.print("{b}", .{byte});
         }
     }
 
@@ -64,12 +64,13 @@ pub fn main() !void {
         break;
     }
 
-    var reader: std.fs.File.Reader = undefined;
-
+    // if data is coming from stdin
     if (arg_count == 0) {
         const stdin = std.io.getStdIn();
-        reader = stdin.reader();
+        var buf = std.io.bufferedReader(stdin.reader());
+        const reader = buf.reader();
         try count(reader, filename);
+        // if data is coming from file
     } else {
         var file = std.fs.cwd().openFile(filename, .{}) catch |err| switch (err) {
             std.posix.OpenError.AccessDenied => {
@@ -87,7 +88,8 @@ pub fn main() !void {
         };
 
         defer file.close();
-        reader = file.reader();
+        var buf = std.io.bufferedReader(file.reader());
+        const reader = buf.reader();
         try count(reader, filename);
     }
 }
