@@ -1,10 +1,6 @@
 const std = @import("std");
 
-//test "basic case" {
-//    const text: []const u8 = "this is some text";
-//}
-
-pub fn count(reader: anytype, filename: []const u8) !void {
+pub fn count(reader: std.io.AnyReader, filename: []const u8) !void {
     var in_word: bool = false;
     var wc: usize = 0; // word count
     var lc: usize = 0; // line count
@@ -68,7 +64,7 @@ pub fn main() !void {
     if (arg_count == 0) {
         const stdin = std.io.getStdIn();
         var buf = std.io.bufferedReader(stdin.reader());
-        const reader = buf.reader();
+        const reader = buf.reader().any();
         try count(reader, filename);
         // if data is coming from file
     } else {
@@ -89,7 +85,7 @@ pub fn main() !void {
 
         defer file.close();
         var buf = std.io.bufferedReader(file.reader());
-        const reader = buf.reader();
+        const reader = buf.reader().any();
         try count(reader, filename);
     }
 }
